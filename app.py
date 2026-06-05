@@ -10,7 +10,16 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("RGPV Result Analysis Dashboard")
+st.markdown(
+    "<h1 style='text-align:center;'>Result Analysis</h1>",
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    f"<h4 style='text-align:center;'>Course: {course} | Branch: {branch} | Semester: {semester}</h4>",
+    unsafe_allow_html=True
+)
+
 
 uploaded_files = st.file_uploader(
     "Upload RGPV Marksheets",
