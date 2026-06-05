@@ -80,7 +80,7 @@ if uploaded_files:
         for line in lines:
 
             match = re.search(
-                r'([A-Z]{2,4}\d{2,4})\s*-\s*\[(T|P)\].*?\b(A\+|A|B\+|B|C\+|C|D|F)\b',
+                r'([A-Z]{2,4}\d{2,4})\s*-\s*\[(T|P)\].*?\s(A\+|A|B\+|B|C\+|C|D|F)\s*$',
                 line
             )
 
