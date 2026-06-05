@@ -15,10 +15,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(
-    f"<h4 style='text-align:center;'>Course: {course} | Branch: {branch} | Semester: {semester}</h4>",
-    unsafe_allow_html=True
-)
+
 
 
 uploaded_files = st.file_uploader(
@@ -103,8 +100,8 @@ if uploaded_files:
 
         for line in lines:
 
-            match = re.search(
-                r'([A-Z]{2,4}\d{2,4})\s*-\s*\[(T|P)\].*?(A\+|A|B\+|B|C\+|C|D|F)',
+           match = re.search(
+                r'([A-Z]{2,4}\d{2,4})\s*-\s*\[(T|P)\].*?(A\s*\+|A|B\s*\+|B|C\s*\+|C|D|F)',
                 line
             )
 
@@ -156,7 +153,21 @@ if uploaded_files:
     st.success(
         f"{len(uploaded_files)} Marksheets Processed Successfully"
     )
+course_value = final_df["Course"].iloc[0]
+branch_value = final_df["Branch"].iloc[0]
+semester_value = final_df["Semester"].iloc[0]
 
+st.markdown(
+    f"""
+    <h4 style='text-align:center;'>
+    Course: {course_value} |
+    Branch: {branch_value} |
+    Semester: {semester_value}
+    </h4>
+    """,
+    unsafe_allow_html=True
+)
+    
     st.subheader("Student Result Table")
 
     st.dataframe(
@@ -187,126 +198,299 @@ if uploaded_files:
         file_name="RGPV_Final_Result.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+st.divider()
+grade_points = {
+    "A+": 10,
+    "A": 9,
+    "B+": 8,
+    "B": 7,
+    "C+": 6,
+    "C": 5,
+    "D": 4,
+    "F": 0
+}
+
+theory_subjects = [
+    col for col in subject_cols
+    if col.endswith("-[T]")
+]
+
+subject_performance = {}
+
+for subject in theory_subjects:
+
+    grades = final_df[subject].dropna()
+
+    scores = []
+
+    for grade in grades:
+
+        grade = str(grade).strip()
+
+        if grade in grade_points:
+            scores.append(
+                grade_points[grade]
+            )
+
+    if len(scores):
+
+        subject_performance[subject] = (
+            sum(scores) / len(scores)
+        )
+
+performance_df = pd.DataFrame({
+    "Subject": list(subject_performance.keys()),
+    "Average Score": list(subject_performance.values())
+})
+
+if len(performance_df):
+
+    performance_df = performance_df.sort_values(
+        by="Average Score",
+        ascending=False
+    )
 
     # -----------------------
     # Subject Wise Pie Chart
     # -----------------------
 
-    st.subheader("Subject Wise Grade Analysis")
-
-    selected_subject = st.selectbox(
-        "Select Subject",
-        sorted(subject_cols)
-    )
-
-    grades = final_df[selected_subject].dropna()
-
-    if len(grades) > 0:
-
-        grade_counts = grades.value_counts()
-
-        fig, ax = plt.subplots(
-            figsize=(7,7)
-        )
-
-        ax.pie(
-            grade_counts.values,
-            labels=grade_counts.index,
-            autopct="%1.1f%%",
-            startangle=90
-        )
-
-        ax.set_title(
-            f"Grade Distribution - {selected_subject}"
-        )
-
-        st.pyplot(fig)
+    
 
     # -----------------------
     # Theory Subject Analysis
     # -----------------------
+col1, col2 = st.columns([1,2])
 
-    st.subheader(
-        "Theory Subject Performance Analysis"
+with col1:
+
+    st.subheader("Summary")
+
+    st.metric(
+        "No of Students",
+        len(final_df)
     )
 
-    grade_points = {
-        "A+": 10,
-        "A": 9,
-        "B+": 8,
-        "B": 7,
-        "C+": 6,
-        "C": 5,
-        "D": 4,
-        "F": 0
-    }
+    st.metric(
+        "No of Theory Papers",
+        int(final_df["No of Theory Papers"].sum())
+    )
 
-    theory_subjects = [
-        col for col in subject_cols
-        if col.endswith("-[T]")
-    ]
+    st.metric(
+        "No of Practical Papers",
+        int(final_df["No of Practical Papers"].sum())
+    )
 
-    subject_performance = {}
+    if len(performance_df):
 
-    for subject in theory_subjects:
+        st.success(
+            f"Best Theory Paper: {performance_df.iloc[0]['Subject']}"
+        )
 
-        grades = final_df[subject].dropna()
+        st.error(
+            f"Weakest Theory Paper: {performance_df.iloc[-1]['Subject']}"
+        )
 
-        scores = []
+with col2:
 
-        for grade in grades:
+    st.subheader(
+        "Theory Papers Performance"
+    )
 
-            grade = str(grade).strip()
+    if len(performance_df):
 
-            if grade in grade_points:
-                scores.append(
-                    grade_points[grade]
-                )
+        fig_bar, ax_bar = plt.subplots(
+            figsize=(10,5)
+        )
 
-        if len(scores) > 0:
+        ax_bar.bar(
+            performance_df["Subject"],
+            performance_df["Average Score"]
+        )
 
-            subject_performance[subject] = (
-                sum(scores) / len(scores)
+        ax_bar.set_ylabel(
+            "Average Score"
+        )
+
+        ax_bar.tick_params(
+            axis='x',
+            rotation=90
+        )
+
+        st.pyplot(fig_bar)
+
+    #--------------------Theory Pie Chart------------
+st.divider()
+
+st.subheader(
+    "Theory Subject Grade Distribution"
+)
+for i in range(0, len(theory_subjects), 4):
+
+    cols = st.columns(4)
+
+    for j, subject in enumerate(
+        theory_subjects[i:i+4]
+    ):
+
+        with cols[j]:
+
+            grades = final_df[
+                subject
+            ].dropna()
+
+            if len(grades) == 0:
+                continue
+
+            grade_counts = grades.value_counts()
+
+            fig, ax = plt.subplots(
+                figsize=(4,4)
             )
 
-    if len(subject_performance) > 0:
-
-        performance_df = pd.DataFrame({
-            "Subject": list(
-                subject_performance.keys()
-            ),
-            "Average Score": list(
-                subject_performance.values()
+            ax.pie(
+                grade_counts.values,
+                labels=grade_counts.index,
+                autopct="%1.1f%%"
             )
-        })
 
-        performance_df = performance_df.sort_values(
-            by="Average Score",
-            ascending=False
-        )
+            ax.set_title(subject)
 
-        st.dataframe(
-            performance_df,
-            use_container_width=True
-        )
+            st.pyplot(fig)
 
-        fig2, ax2 = plt.subplots(
-            figsize=(8,8)
-        )
+            img = BytesIO()
 
-        ax2.pie(
-            performance_df["Average Score"],
-            labels=performance_df["Subject"],
-            autopct="%1.1f%%",
-            startangle=90
-        )
+            fig.savefig(
+                img,
+                format="png"
+            )
 
-        ax2.set_title(
-            "Theory Subject Performance"
-        )
+            img.seek(0)
 
-        st.pyplot(fig2)
+            st.download_button(
+                f"Download {subject}",
+                img,
+                file_name=f"{subject}.png",
+                mime="image/png",
+                key=f"t_{subject}"
+            )
+            for i in range(0, len(theory_subjects), 4):
 
+    cols = st.columns(4)
+
+    for j, subject in enumerate(
+        theory_subjects[i:i+4]
+    ):
+
+        with cols[j]:
+
+            grades = final_df[
+                subject
+            ].dropna()
+
+            if len(grades) == 0:
+                continue
+
+            grade_counts = grades.value_counts()
+
+            fig, ax = plt.subplots(
+                figsize=(4,4)
+            )
+
+            ax.pie(
+                grade_counts.values,
+                labels=grade_counts.index,
+                autopct="%1.1f%%"
+            )
+
+            ax.set_title(subject)
+
+            st.pyplot(fig)
+
+            img = BytesIO()
+
+            fig.savefig(
+                img,
+                format="png"
+            )
+
+            img.seek(0)
+
+            st.download_button(
+                f"Download {subject}",
+                img,
+                file_name=f"{subject}.png",
+                mime="image/png",
+                key=f"t_{subject}"
+            )
+
+    st.divider()
+
+st.subheader(
+    "Practical Subject Grade Distribution"
+)
+
+practical_subjects = [
+    col for col in subject_cols
+    if col.endswith("-[P]")
+]
+
+for i in range(
+    0,
+    len(practical_subjects),
+    4
+):
+
+    cols = st.columns(4)
+
+    for j, subject in enumerate(
+        practical_subjects[i:i+4]
+    ):
+
+        with cols[j]:
+
+            grades = final_df[
+                subject
+            ].dropna()
+
+            if len(grades) == 0:
+                continue
+
+            grade_counts = grades.value_counts()
+
+            fig, ax = plt.subplots(
+                figsize=(4,4)
+            )
+
+            ax.pie(
+                grade_counts.values,
+                labels=grade_counts.index,
+                autopct="%1.1f%%"
+            )
+
+            ax.set_title(subject)
+
+            st.pyplot(fig)
+
+            img = BytesIO()
+
+            fig.savefig(
+                img,
+                format="png"
+            )
+
+            img.seek(0)
+
+            st.download_button(
+                f"Download {subject}",
+                img,
+                file_name=f"{subject}.png",
+                mime="image/png",
+                key=f"p_{subject}"
+            )
+
+    
+
+   
         st.success(
             f"Best Subject: {performance_df.iloc[0]['Subject']}"
         )
