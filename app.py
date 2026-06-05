@@ -105,7 +105,7 @@ if uploaded_files:
                 line
             )
 
-            if match:
+        if match:
 
                 subject_code = match.group(1)
                 paper_type = match.group(2)
