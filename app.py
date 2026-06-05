@@ -179,9 +179,9 @@ st.dataframe(
     # Excel Download
     # -----------------------
 
-    excel_buffer = BytesIO()
+excel_buffer = BytesIO()
 
-    with pd.ExcelWriter(
+with pd.ExcelWriter(
         excel_buffer,
         engine="openpyxl"
     ) as writer:
@@ -192,7 +192,7 @@ st.dataframe(
             index=False
         )
 
-    st.download_button(
+st.download_button(
         label="Download Excel File",
         data=excel_buffer.getvalue(),
         file_name="RGPV_Final_Result.xlsx",
@@ -423,7 +423,7 @@ for i in range(0, len(theory_subjects), 4):
                 key=f"t_{subject}"
             )
 
-    st.divider()
+st.divider()
 
 st.subheader(
     "Practical Subject Grade Distribution"
@@ -491,10 +491,10 @@ for i in range(
     
 
    
-        st.success(
+    st.success(
             f"Best Subject: {performance_df.iloc[0]['Subject']}"
         )
 
-        st.error(
+    st.error(
             f"Weakest Subject: {performance_df.iloc[-1]['Subject']}"
         )
