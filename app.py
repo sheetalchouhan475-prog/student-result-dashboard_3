@@ -373,7 +373,7 @@ for i in range(0, len(theory_subjects), 4):
                 mime="image/png",
                 key=f"t_{subject}"
             )
-            for i in range(0, len(theory_subjects), 4):
+for i in range(0, len(theory_subjects), 4):
 
     cols = st.columns(4)
 
