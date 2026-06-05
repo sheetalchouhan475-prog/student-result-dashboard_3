@@ -128,6 +128,7 @@ if uploaded_files:
     # -----------------------
     # Final DataFrame
     # -----------------------
+ student_rows = []
 
 final_df = pd.DataFrame(student_rows)
 
