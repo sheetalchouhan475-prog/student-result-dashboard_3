@@ -131,7 +131,7 @@ if uploaded_files:
 
 final_df = pd.DataFrame(student_rows)
 
-    base_cols = [
+base_cols = [
         "Name",
         "Roll No",
         "Course",
@@ -141,16 +141,16 @@ final_df = pd.DataFrame(student_rows)
         "No of Practical Papers"
     ]
 
-    subject_cols = [
+subject_cols = [
         c for c in final_df.columns
         if c not in base_cols
     ]
 
-    final_df = final_df[
+final_df = final_df[
         base_cols + sorted(subject_cols)
     ]
 
-    st.success(
+st.success(
         f"{len(uploaded_files)} Marksheets Processed Successfully"
     )
 course_value = final_df["Course"].iloc[0]
