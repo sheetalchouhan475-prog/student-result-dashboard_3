@@ -128,28 +128,28 @@ if uploaded_files:
     # -----------------------
     # Final DataFrame
     # -----------------------
- student_rows = []
 
-final_df = pd.DataFrame(student_rows)
 
-base_cols = [
-        "Name",
-        "Roll No",
-        "Course",
-        "Branch",
-        "Semester",
-        "No of Theory Papers",
-        "No of Practical Papers"
-    ]
+        final_df = pd.DataFrame(student_rows)
 
-subject_cols = [
-        c for c in final_df.columns
-        if c not in base_cols
-    ]
+        base_cols = [
+            "Name",
+            "Roll No",
+            "Course",
+            "Branch",
+            "Semester",
+            "No of Theory Papers",
+            "No of Practical Papers"
+        ]
 
-final_df = final_df[
-        base_cols + sorted(subject_cols)
-    ]
+        subject_cols = [
+            c for c in final_df.columns
+            if c not in base_cols
+        ]
+
+        final_df = final_df[
+            base_cols + sorted(subject_cols)
+        ]
 
 st.success(
         f"{len(uploaded_files)} Marksheets Processed Successfully"
