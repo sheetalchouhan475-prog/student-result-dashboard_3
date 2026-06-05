@@ -129,7 +129,7 @@ if uploaded_files:
     # Final DataFrame
     # -----------------------
 
-    final_df = pd.DataFrame(student_rows)
+final_df = pd.DataFrame(student_rows)
 
     base_cols = [
         "Name",
