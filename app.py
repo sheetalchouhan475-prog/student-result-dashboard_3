@@ -168,9 +168,9 @@ st.markdown(
     unsafe_allow_html=True
 )
     
-    st.subheader("Student Result Table")
+st.subheader("Student Result Table")
 
-    st.dataframe(
+st.dataframe(
         final_df,
         use_container_width=True
     )
