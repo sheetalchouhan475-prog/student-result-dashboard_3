@@ -105,7 +105,7 @@ if uploaded_files:
                 line
             )
 
-        if match:
+            if match:
 
                 subject_code = match.group(1)
                 paper_type = match.group(2)
@@ -130,9 +130,9 @@ if uploaded_files:
     # -----------------------
 
 
-        final_df = pd.DataFrame(student_rows)
+    final_df = pd.DataFrame(student_rows)
 
-        base_cols = [
+    base_cols = [
             "Name",
             "Roll No",
             "Course",
@@ -142,12 +142,12 @@ if uploaded_files:
             "No of Practical Papers"
         ]
 
-        subject_cols = [
+    subject_cols = [
             c for c in final_df.columns
             if c not in base_cols
         ]
 
-        final_df = final_df[
+    final_df = final_df[
             base_cols + sorted(subject_cols)
         ]
 
